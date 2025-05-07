@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fortune Gems1️⃣ (Login & Slot Game)</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #111;
+      color: #fff;
+      text-align: center;
+      padding: 30px;
+    }
+    .slot-container, .balance, .game-ui {
+      display: none;
+    }
+    .slot-container {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin: 20px 0;
+    }
+    .slot {
+      width: 80px;
+      height: 80px;
+      font-size: 2em;
+      background: #222;
+      border: 3px solid #44f;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 12px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 1.2em;
+      cursor: pointer;
+      background: #44f;
+      border: none;
+      color: white;
+      border-radius: 8px;
+      margin: 5px;
+    }
+    input {
+      padding: 10px;
+      font-size: 1em;
+      margin: 5px;
+    }
+    .result {
+      margin-top: 20px;
+      font-size: 1.4em;
+    }
+    .balance {
+      margin-top: 15px;
+      font-size: 1.2em;
+      color: #0f0;
+    }
+    .bkash-info {
+      margin-top: 20px;
+      background: #222;
+      padding: 10px;
+      border-radius: 8px;
+      border: 2px solid #0ff;
+    }
+    .bkash-info p {
+      margin: 5px 0;
+      color: #0ff;
+    }
+  </style>
+</head>
+<body>
+  <h1>💎 Fortune Gems 💎</h1>
+
+  <div id="auth">
+    <h2>🔐 লগইন অথবা রেজিস্ট্রেশন</h2>
+    <input type="text" id="username" placeholder="ইউজারনেম" />
+    <input type="password" id="password" placeholder="পাসওয়ার্ড" />
+    <br />
+    <button onclick="register()">রেজিস্ট্রার</button>
+    <button onclick="login()">লগইন</button>
+    <div id="authMsg" class="result"></div>
+  </div>
+
+  <div class="balance game-ui">আপনার ব্যালেন্স: <span id="balance">0</span> টাকা</div>
+  <div class="game-ui">
+    <div class="bkash-info">
+      <p>📱 বিকাশ নম্বর: <strong>01854807526</strong></p>
+      <p>💰 আপনি বিকাশে টাকা পাঠানোর পর নিচে টাকা লিখে ডিপোজিট দিন এবং আপনার ট্রানজেকশন আইডি প্রদান করুন।</p>
+    </div>
+    <input type="number" id="depositAmount" placeholder="কত টাকা ডিপোজিট করবেন?" min="200" max="20000" />
+    <input type="text" id="transactionID" placeholder="ট্রানজেকশন আইডি" />
+    <button onclick="depositMoney()">ডিপোজিট</button>
+  </div>
+
+  <div class="game-ui">
+    <div class="bkash-info">
+      <p>💵 উইথড্র করার জন্য ৪০০ থেকে ২৫,০০০ টাকা নির্বাচন করুন।</p>
+    </div>
+    <input type="number" id="withdrawAmount" placeholder="কত টাকা উইথড্র করবেন?" min="400" max="25000" />
+    <button onclick="withdrawMoney()">উইথড্র</button>
+  </div>
+
+  <div class="slot-container game-ui">
+    <div class="slot" id="slot1">💠</div>
+    <div class="slot" id="slot2">🔷</div>
+    <div class="slot" id="slot3">💎</div>
+  </div>
+
+  <div class="game-ui">
+    <button onclick="spin()">Spin (10 টাকা)</button>
+    <div class="result" id="result">ঘুরান এবং দেখুন আপনি জিতেন কি না!</div>
+  </div>
+
+  <script>
+    const symbols = ['💎', '🔷', '💠', '🔸', '🔹'];
+    const symbolValues = {
+      '💎💎💎': 60,
+      '🔷🔷🔷': 30,
+      '💠💠💠': 20,
+      '🔸🔸🔸': 10,
+      '🔹🔹🔹': 5,
+    };
+    let balance = 0;
+    let currentUser = null;
+    let betAmount = 2,3,4,5,6,7,8,9,10,12,15,20,25,30,35,40,50,60,70,80,90,100,200,300,400,500,700,800,1000; // Default bet amount
+
+    function updateBalanceDisplay() {
+      document.getElementById('balance').textContent = balance;
+    }
+
+    function showGameUI() {
+      document.querySelectorAll('.game-ui').forEach(e => e.style.display = 'block');
+      document.getElementById('auth').style.display = 'none';
+    }
+
+    function register() {
+      const user = document.getElementById('username').value;
+      const pass = document.getElementById('password').value;
+      if (!user || !pass) {
+        document.getElementById('authMsg').textContent = '⚠️ ইউজারনেম এবং পাসওয়ার্ড দিন!';
+        return;
+      }
+      if (localStorage.getItem('user_' + user)) {
+        document.getElementById('authMsg').textContent = '❌ এই ইউজারনেম আগে থেকেই আছে!';
+        return;
+      }
+      const userData = { password: pass, balance: 120 }; // 100 + 20 = 120 টাকা বোনাস সহ
+      localStorage.setItem('user_' + user, JSON.stringify(userData));
+      document.getElementById('authMsg').textContent = '✅ রেজিস্ট্রেশন সফল! এখন লগইন করুন।';
+    }
+
+    function login() {
+      const user = document.getElementById('username').value;
+      const pass = document.getElementById('password').value;
+      const stored = localStorage.getItem('user_' + user);
+      if (!stored) {
+        document.getElementById('authMsg').textContent = '❌ ইউজার খুঁজে পাওয়া যায়নি!';
+        return;
+      }
+      const userData = JSON.parse(stored);
+      if (userData.password !== pass) {
+        document.getElementById('authMsg').textContent = '❌ পাসওয়ার্ড ভুল!';
+        return;
+      }
+      currentUser = user;
+      balance = userData.balance;
+      updateBalanceDisplay();
+      showGameUI();
+    }
+
+    function spin() {
+      const result = document.getElementById('result');
+      if (balance < betAmount) {
+        result.textContent = '❌ আপনার কাছে পর্যাপ্ত টাকা নেই!';
+        return;
+      }
+
+      balance -= betAmount;
+
+      const s1 = symbols[Math.floor(Math.random() * symbols.length)];
+      const s2 = symbols[Math.floor(Math.random() * symbols.length)];
+      const s3 = symbols[Math.floor(Math.random() * symbols.length)];
+
+      document.getElementById('slot1').textContent = s1;
+      document.getElementById('slot2').textContent = s2;
+      document.getElementById('slot3').textContent = s3;
+
+      let winAmount = 0;
+
+      // If all symbols match, multiply by the bet amount (15x here)
+      if (s1 === s2 && s2 === s3) {
+        winAmount = symbolValues[s1] * 15;
+        result.textContent = `🎉 আপনি জিতেছেন! তিনটি মিলেছে! +${winAmount} টাকা`;
+      } else if (s1 === s2 || s2 === s3 || s1 === s3) {
+        winAmount = symbolValues[s1] || symbolValues[s2] || symbolValues[s3];
+        result.textContent = `😊 দুইটি মিলেছে! +${winAmount} টাকা`;
+      } else {
+        result.textContent = '😢 কিছুই মেলেনি। আবার চেষ্টা করুন!';
+      }
+
+      balance += winAmount;
+      updateBalanceDisplay();
+      saveUserData();
+    }
+
+    function depositMoney() {
+      const amount = parseInt(document.getElementById('depositAmount').value);
+      const transactionID = document.getElementById('transactionID').value;
+      if (isNaN(amount) || amount < 200 || amount > 20000) {
+        alert('ডিপোজিটের পরিমাণ ২০০ থেকে ২০,০০০ টাকা হতে হবে!');
+        return;
+      }
+      if (!transactionID) {
+        alert('আপনার ট্রানজেকশন আইডি প্রদান করুন!');
+        return;
+      }
+      alert("⚠️ মনে রাখবেন: আপনার বিকাশে টাকা পাঠানোর তথ্য অ্যাডমিন ম্যানুয়ালি যাচাই করবে। এটি শুধু টাকা যোগ করার অনুরোধ।");
+      balance += amount;
+      updateBalanceDisplay();
+      saveUserData();
+      document.getElementById('depositAmount').value = '';
+      document.getElementById('transactionID').value = '';
+    }
+
+    function withdrawMoney() {
+      const amount = parseInt(document.getElementById('withdrawAmount').value);
+      if (isNaN(amount) || amount < 400 || amount > 25000) {
+        alert('উইথড্রয়ের পরিমাণ ৪০০ থেকে ২৫,০০০ টাকা হতে হবে!');
+        return;
+      }
+      if (balance < amount) {
+        alert('আপনার ব্যালেন্স পর্যাপ্ত নয়!');
+        return;
+      }
+      balance -= amount;
+      alert('আপনার টাকা সফলভাবে উইথড্র করা হয়েছে!');
+      updateBalanceDisplay();
+      saveUserData();
+      document.getElementById('withdrawAmount').value = '';
+    }
+
+    function saveUserData() {
+      const userData = JSON.parse(localStorage.getItem('user_' + currentUser));
+      userData.balance = balance;
+      localStorage.setItem('user_' + currentUser, JSON.stringify(userData));
+    }
+  </script>
+</body>
+</html>
